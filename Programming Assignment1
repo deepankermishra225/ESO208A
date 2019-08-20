@@ -1,0 +1,400 @@
+%180225
+%Deepanker Mishra
+prompt = "Is the equation polynomial? Y/N     :        " ;
+t = input(prompt,'s') ;
+if(t=='N')
+  prompt = "Choose one of the following methods:\n (1)Bisection Method\n(2)False Position Method\n(3)Fixed Point Method\n(4)Newton Raphson\n(5)Secant Method:\nChoose from(1 to 5) :   " ; 
+    t = input(prompt) ;
+    if t==1
+        %Bisection Method
+    prompt = 'Enter the function:        ' ;
+    f = input(prompt,'s') ;
+    f = inline(f,'x') ;
+xl=input('Enter the first value of guess interval:     ');
+xu=input('Enter the end value of guess interval:       ');
+tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+val=input('How close should f(x) be to zero?:          ');
+itr=input('Enter the maximum number of iterations:     ');
+while f(xl)*f(xu)>0
+    fprintf('The guess is incorrect\n') ;
+    xl=input('Enter the first value of guess interval:     ');
+    xu=input('Enter the end value of guess interval:       ');
+end
+xnew = [] ;
+r = []    ;
+for i=1:itr
+xr=(xu+xl)/2 ;
+if f(xu)*f(xr)<0
+    xl=xr;
+else
+    xu=xr;
+end
+
+xnew(i)=xr;
+if i>1
+  r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
+  if r(i)<tol
+    flag = 2 ;
+    break ;
+  end
+end
+if (abs(f(xr))<=val)
+    flag = 1 ;
+    break ;
+end
+end
+disp('The required root of the equation is: ');
+ disp(xr) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+fplot(f) ;
+ylabel('f(x)') ;
+xlabel('x') ;
+grid on ;
+figure ;
+plot(1:i , r) ;
+ylabel('relative error') ;
+xlabel('number of iterations') ;
+grid on ;
+    elseif t==2
+        %false position method
+    prompt = 'Enter the function:        ' ;
+    f = input(prompt,'s') ;
+    f = inline(f,'x') ;
+xl=input('Enter the first value of guess interval:     ');
+xu=input('Enter the end value of guess interval:       ');
+tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+val=input('How close should f(x) be to zero?:          ');
+itr=input('Enter the maximum number of iterations:     ');
+while f(xl)*f(xu)>0
+    fprintf('The guess is incorrect\n') ;
+    xl=input('Enter the first value of guess interval:     ');
+    xu=input('Enter the end value of guess interval:       ');
+end
+xnew = [] ;
+r = [] ;
+for i=1:itr
+    xr = (xl*f(xu) + xu*f(xl))/(f(xu)-f(xl)) ;
+    if f(xu)*f(xr)<0
+    xl=xr;
+    else
+    xu=xr;
+    end
+    xnew(i)=xr;
+if i>1
+  r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
+  if r(i)<tol
+    flag = 2 ;
+    break ;
+  end
+end
+if (abs(f(xr))<=val)
+    flag = 1 ;
+    break ;
+end
+end
+disp('The required root of the equation is: ');
+ disp(xr) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+j = linspace(-20,20,100) ;
+y = j - f(j) ;
+plot(j,y) ;
+ylabel('f(x)') ;
+xlabel('x') ;
+grid on ;
+figure ;
+plot(1:i , r) ;
+ylabel('relative error') ;
+xlabel('number of iterations') ;
+    elseif t==3
+        %fixed point method
+prompt = 'Enter the function g(x) such thatf(x) is rearranged into x = g(x):        ' ;
+f = input(prompt,'s') ;
+f = inline(f,'x') ;
+xl=input('Enter the first value of guess interval:     ');
+tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+val=input('How close should f(x) be to zero?:          ');
+itr=input('Enter the maximum number of iterations:     ');
+xnew = [] ;
+r = [] ;
+
+for i = 1:itr
+     xr = g(xl) ;
+xnew(i)=xr;
+xl = xr ;
+if i>1
+  r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
+  if r(i)<tol
+    flag = 2 ;
+    break ;
+  end
+end
+if (abs(f(xr))<=val)
+    flag = 1 ;
+    break ;
+end
+end
+
+        disp('The required root of the equation is: ');
+ disp(xr) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+fplot(f) ;
+ylabel('f(x)') ;
+xlabel('x') ;
+grid on ;
+figure ;
+plot(1:i , r) ;
+ylabel('relative error') ;
+xlabel('number of iterations') ;
+
+    elseif t==4
+        %newton raphson
+        prompt = 'Enter the function:         ' ;
+        f = input(prompt,'s') ;
+        f = inline(f,'x') ;
+        prompt = 'Enter the derivative of the function:         ' ;
+        d = input(prompt,'s') ;
+        d = inline(d,'x')  ;
+       xl=input('Enter the  value of guess :     ');
+       tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+       val=input('How close should f(x) be to zero?:          ');
+       itr=input('Enter the maximum number of iterations:     ');
+       xnew = [] ;
+       r = [] ;
+for i = 1:itr
+     xr = xl - (f(xl)/d(xl)) ;
+xnew(i)=xr;
+xl = xr ;
+if i>1
+  r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
+  if r(i)<tol
+    flag = 2 ;
+    break ;
+  end
+end
+if (abs(f(xr))<=val)
+    flag = 1 ;
+    break ;
+end
+end
+        
+        disp('The required root of the equation is: ');
+ disp(xr) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+fplot(f) ;
+ylabel('f(x)') ;
+xlabel('x') ;
+grid on ;
+figure ;
+plot(1:i , r) ;
+ylabel('relative error') ;
+xlabel('number of iterations') ;
+        
+    elseif t==5
+        %secant method
+xl=input('Enter the first value of guess interval:     ');
+xu=input('Enter the end value of guess interval:       ');
+tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+val=input('How close should f(x) be to zero?:          ');
+itr=input('Enter the maximum number of iterations:     ');
+xnew = [] ;
+r = [] ;
+for i = 1:itr
+  xr = xu - (f(xu)*(xu - xl)/(f(xu)-f(xl))) ;
+xnew(i)=xr;
+xl = xr ;
+if i>1
+  r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
+  if r(i)<tol
+    flag = 2 ;
+    break ;
+  end
+end
+if (abs(f(xr))<=val)
+    flag = 1 ;
+    break ;
+end
+end
+     
+ disp('The required root of the equation is: ');
+ disp(xr) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+fplot(f) ;
+ylabel('f(x)') ;
+xlabel('x') ;
+grid on ;
+figure ;
+plot(1:i , r) ;
+ylabel('relative error') ;
+xlabel('number of iterations') ;
+        
+    end
+    
+    
+elseif t=='Y'
+    poly  = [] ;
+    coeff = [] ; 
+    order = input('order of the polynomial: ');
+    for i = 1: order+1
+        poly(i) = input('input coeff: ');
+    end  
+    prompt = 'Choose between (1) Muller Method \n (2)Bairstow Method:\n' ;
+    t = input(prompt) ;
+    
+if t==1
+        %muller method
+xl=input('Enter the first value of guess interval:     ');
+xm=input('Enter the second value of the guess interval:     ') ;
+xu=input('Enter the end value of guess interval:       ');
+tol=input('Enter the stopping criteria:\nEnter the allowed error in the root :       ');
+val=input('How close should f(x) be to zero?:          ');
+itr=input('Enter the maximum number of iterations:     ');
+xnew = [] ;
+r = [] ; 
+xnew = [xl xm xu ] ;
+for i = 1:itr
+   h0 = xnew(i+1) - xnew(i);
+           h1 = xnew(i+2) - xnew(i+1);
+           divd1 = (polyval(poly, xnew(i+1)) - polyval(poly, xnew(i)))/h0;
+           divd2 = (polyval(poly, xnew(i+2)) - polyval(poly, xnew(i+1)))/h1;
+           a = (divd2 - divd1)/(h0+h1);
+           b = a*h1 + divd2;
+           c = polyval(poly,xnew(i+2));
+           deno1 = abs(b + sqrt(b^(2) - 4*a*c));
+           deno2 = abs(b - sqrt(b^(2) - 4*a*c));
+           if(deno1 > deno2)
+               deno = deno1;
+           else
+               deno = deno2;
+           end    
+           xnew(i+3) =  xnew(i+2) - ((2*c)/deno);
+           r(i) = abs((xnew(i+3)-xnew(i+2))/xnew(i+3));
+if r(i)<tol
+    flag = 2 ;
+    break ;
+end
+if abs(polyval(poly,xnew(i+3)))<=val
+    flag = 1 ;
+    break ;
+end
+end   
+        
+disp('The required root of the equation is: ');
+disp(xnew(i+3)) ;
+if flag == 2
+          disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+       elseif flag==1
+            disp('Stopping Criteria is convergence criteria for the function value');
+       else
+          disp('Stopping criteria is number of iterations');
+end
+xr = xnew(i+3)-2:0.2:xnew(i+3) ;
+plot(xr,ployval(ploly,xr))   ;
+xlabel('x') ;
+ylabel('f(x)') ;
+figure ;
+plot(1:i,r) ;
+grid on ;
+xlabel('Number of iterations') ;
+ylabel('Relative Error') ;
+
+elseif t==2
+        %bairstow method
+        aer = [] ;
+        aes = [] ;
+        e = [] ;
+        d = [] ;
+        q = [] ;
+        root1 = [] ;
+        root2 = [] ;
+           drr = input('Enter stopping criteria\nRelative approximate error in r: ');
+           srr = input('Enter stopping criteria\nRelative approximate error in s: ');
+           itr = input('Maximum Iteration number: ');
+for k= 1:order/2
+               r = [];
+               s = [];
+               r(1) = input('\nEnter r: ');
+               s(1) = input('\nEnter s: ');           
+               for j = 1:itr
+                   q(1) = 1;
+                   q(2) = -r(j);
+                   q(3) = -s(j);
+                   d(1) = poly(1);
+                   d(2) = poly(2)+r(j)*d(1);
+                   for i = 3:order+1
+                       d(i) = poly(i) + r(j)*d(i-1) + s(j)*d(i-2);
+                   end
+                   e(1) = 0;
+                   e(2) = d(1);
+                   e(3) = d(2)+r(j)*e(2);
+                   for i = 4:order+1
+                       e(i) = d(i-1) + r(j)*e(i-1) + s(j)*e(i-2);
+                   end
+                   syms dr ds
+                   eqn1 = e(order)*ds + e(order+1)*dr == -d(order+1);
+                   eqn2 = e(order-1)*ds + e(order)*dr == -d(order);
+                   sol = solve([eqn1, eqn2], [ds, dr]);
+                   r(j+1) = r(j) + double(sol.dr);
+                   s(j+1) = s(j) + double(sol.ds);
+                   aer(j) = abs((r(j+1)-r(j))/r(j+1));
+                   aes(j) = abs((s(j+1)-s(j))/s(j+1));
+                   if(aer(j)<=drr && aes(j)<=srr)
+                       flag = 2;
+                       break;
+                   end 
+               end
+               root1(1) = 0.5*(r(j)+sqrt(r(j)^2+(4*s(j))));
+               root2(1) = 0.5*(r(j)-sqrt(r(j)^2+(4*s(j))));
+               fprintf('The value of the root is: %f%+fi\n',real(root1(1)), imag(root1(1)));
+               fprintf('The value of the root is: %f%+fi\n',real(root2(1)), imag(root2(1)));
+               if flag == 2
+                  disp('Stopping Criteria is convergence criterion for relative approximate errors in successive iterations');
+               elseif flag==1
+                    disp('Stopping Criteria is convergence criteria for the function value');
+               else
+                  disp('Stopping criteria is number of iterations'); 
+               end
+               plot(1:j,aer) ;
+               grid on;
+               figure;
+               plot(1:j,aes) ;
+               grid on;
+               figure;
+        
+end
+               xr = -5:0.2:5 ;
+               plot(polyval(poly,xr)) ;
+               xlabel('x') ;
+               ylabel('f(x)') ;
+               grid on ;
+end
+end
