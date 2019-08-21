@@ -107,9 +107,7 @@ if flag == 2
        else
           disp('Stopping criteria is number of iterations');
 end
-j = linspace(-20,20,100) ;
-y = j - f(j) ;
-plot(j,y) ;
+fplot(f) ;
 ylabel('f(x)') ;
 xlabel('x') ;
 grid on ;
@@ -119,7 +117,7 @@ ylabel('relative error') ;
 xlabel('number of iterations') ;
     elseif t==3
         %fixed point method
-prompt = 'Enter the function g(x) such thatf(x) is rearranged into x = g(x):        ' ;
+prompt = 'Enter the function g(x) such that f(x) is rearranged into x = g(x):        ' ;
 f = input(prompt,'s') ;
 f = inline(f,'x') ;
 xl=input('Enter the first value of guess interval:     ');
@@ -130,9 +128,11 @@ xnew = [] ;
 r = [] ;
 
 for i = 1:itr
-     xr = g(xl) ;
-xnew(i)=xr;
-xl = xr ;
+    if i>1
+     xnew(i) = f(xnew(i-1)) ;
+    else
+        xnew(i) = xl ;
+    end
 if i>1
   r(i) = abs((xnew(i)-xnew(i-1))/xnew(i));
   if r(i)<tol
@@ -155,10 +155,16 @@ if flag == 2
        else
           disp('Stopping criteria is number of iterations');
 end
-fplot(f) ;
+j = linspace(xl,xnew(i),100) ;
+y = j ;
+plot(j,y) ;
+hold on ;
+y = f(j) ;
+plot(j,y) ;
 ylabel('f(x)') ;
 xlabel('x') ;
 grid on ;
+hold off ;
 figure ;
 plot(1:i , r) ;
 ylabel('relative error') ;
@@ -281,7 +287,7 @@ itr=input('Enter the maximum number of iterations:     ');
 xnew = [] ;
 r = [] ; 
 xnew = [xl xm xu ] ;
-for i = 1:itr
+for i = 1:itr-3
    h0 = xnew(i+1) - xnew(i);
            h1 = xnew(i+2) - xnew(i+1);
            divd1 = (polyval(poly, xnew(i+1)) - polyval(poly, xnew(i)))/h0;
@@ -318,7 +324,7 @@ if flag == 2
           disp('Stopping criteria is number of iterations');
 end
 xr = xnew(i+3)-2:0.2:xnew(i+3) ;
-plot(xr,ployval(ploly,xr))   ;
+plot(xr,polyval(poly,xr))   ;
 xlabel('x') ;
 ylabel('f(x)') ;
 figure ;
@@ -329,8 +335,6 @@ ylabel('Relative Error') ;
 
 elseif t==2
         %bairstow method
-        aer = [] ;
-        aes = [] ;
         e = [] ;
         d = [] ;
         q = [] ;
@@ -340,6 +344,8 @@ elseif t==2
            srr = input('Enter stopping criteria\nRelative approximate error in s: ');
            itr = input('Maximum Iteration number: ');
 for k= 1:order/2
+               aer=[];
+               aes=[];
                r = [];
                s = [];
                r(1) = input('\nEnter r: ');
@@ -384,15 +390,18 @@ for k= 1:order/2
                   disp('Stopping criteria is number of iterations'); 
                end
                plot(1:j,aer) ;
+               xlabel('iterations') ;
+               ylabel('relative error in r') ;
                grid on;
                figure;
                plot(1:j,aes) ;
+               xlabel('iterations') ;
+               ylabel('relative error in s') ;
                grid on;
-               figure;
-        
 end
+               figure ;
                xr = -5:0.2:5 ;
-               plot(polyval(poly,xr)) ;
+               plot(xr,polyval(poly,xr)) ;
                xlabel('x') ;
                ylabel('f(x)') ;
                grid on ;
