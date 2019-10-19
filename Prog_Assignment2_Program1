@@ -1,0 +1,296 @@
+clear ;
+close all ;
+clc
+%DEEPANKER MISHRA
+%180225
+%First Program for assignment2
+fprintf('A  computer program for the solution of a linear system of equations using direct methods ,LU decomposition and matrix Inversion') ;
+choice = input('Choose one of the following:\n(A)Solve a System of Equation :\n(B)Perform a LU decomposition :\n(C)Perform a Matrix Inversion :\n','s') ;
+if choice == 'A'       
+    x = input('Is the input tri-diagonal(Y/N)?:','s') ;
+    
+    if x == 'Y'           %chosen algorithm is thomas algorithm
+        
+    str = input('Enter the input file name:','s') ;
+    str = strcat(str,'.txt') ;
+    fileID = fopen(str,'r') ;
+    line = fgetl(fileID) ;
+    n = sscanf(line,'%d') ;
+    A = zeros(4,n) ;
+    
+    for i = 1:4
+      line = fgetl(fileID) ;
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array l,d,u and b in array A
+    end
+       
+    alpha = zeros(1,n) ;      %defining alpha beta and the solution column
+    beta = zeros(1,n) ;
+    sols = zeros(1,n) ;
+    
+    alpha(1) = A(2,1) ; % alpha(1) = d(1)
+    beta(1) = A(4,1)  ; %beta(1) = b(1)
+    for i=2:n
+       alpha(i) = A(2,i) - (A(1,i)/alpha(i-1))*A(3,i-1) ;    %calculating the values of alpha 
+       beta(i) = A(4,i) - (A(1,i)/alpha(i-1))*beta(i-1) ;    %calculating the values of beta
+    end
+       sols(n) = beta(n)/alpha(n) ;
+       for i = 1:n-1 
+          sols(n-i) = (beta(n-i) - A(3,n-i)*sols(n-i+1))/alpha(n-i) ; 
+       end
+        fileoID = fopen('outputAY.txt','w');                   %storing the solution in an output file
+        fprintf(fileoID,'Roots(x1,x2,x3,x4......xn)\n');
+        fprintf(fileoID,'%f ',sols);
+        fclose(fileID);
+        fclose(fileoID);
+       
+    elseif x == 'N'                   %Guass elimination with partial pivoting is the chosen method
+        
+    str = input('Enter the input file name:','s') ;
+    str = strcat(str,'.txt') ;
+    fileID = fopen(str,'r') ;
+    line = fgetl(fileID) ;
+    n = sscanf(line,'%d') ;
+     A = zeros(n,n) ;
+     b = zeros(1,n) ;
+    for i = 1:n
+      line = fgetl(fileID) ;
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array A  
+    end
+    line = fgetl(fileID) ;
+    b(1,1:n) = sscanf(line,'%f') ;  %storing the value of b 
+    %performing partial pivoting on matrix A
+    temp = zeros(1,n) ;
+    
+    for i = 1:n 
+        for j = i+1:n
+            if abs(A(i,i))<abs(A(j,i))
+                temp = A(i,1:n) ;         %performing swap operation
+                A(i,1:n) = A(j,1:n) ;
+                A(j,1:n) = temp ;
+                btrash = b(i) ;
+                b(i) = b(j) ;
+                b(j) = btrash ;
+            end
+        end
+    end
+    
+    %performing gauss elimination
+    for i = 1:n
+        for j = i+1:n
+           l = A(j,i)/A(i,i) ;           %dividing factor
+           A(j,i:n) = A(j,i:n) - l*(A(i,i:n)) ; 
+           b(j) = b(j) - l*b(i) ;
+        end
+    end
+    
+    sol = zeros(1,n) ;    %storing the solution
+    sol(n) = b(n)/A(n,n) ;
+    for i = 1:n-1
+        sum = 0 ;
+        for k = i:n
+            sum = sum + sol(k)*A(n-i,k)   ;
+        end
+        sol(n-i) = (b(n-i)-sum)/A(n-i,n-i)   ;
+    end
+    
+    fileoID = fopen('outputAN.txt','w');                   %storing the solution in an output file
+    fprintf(fileoID,'Roots(x1,x2,x3,x4......xn)\n');
+    fprintf(fileoID,'%f ',sol);
+    fclose(fileID);
+    fclose(fileoID);
+        
+    end
+    
+    
+elseif choice == 'B'
+    x = input('Is the matrix symmetric and positive definite(Y/N)?:\n','s') ;
+        
+    if x== 'Y'
+    str = input('Enter the input file name:','s') ;
+    str = strcat(str,'.txt') ;
+    fileID = fopen(str,'r') ;
+    line = fgetl(fileID) ;
+    n = sscanf(line,'%d') ;
+     A = zeros(n,n) ;
+     b = zeros(1,n) ;
+    for i = 1:n+1
+      line = fgetl(fileID) ;
+       if i~=n+1
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array A
+        else 
+         b(1,1:n) = sscanf(line,'%f') ;  %storing the value of b   
+       end
+    end  
+    rtemp = zeros(1,n) ;
+    ctemp = zeros(n,1) ;
+    row = zeros(2,n) ;
+    col = zeros(2,n) ;
+    %performing full pivoting on matrix A
+    for i=1:n
+            [rmax , ridx] = max(abs(A(i:n,i:n))) ;   
+            [maxval , cidx] = max(rmax) ;            
+            row(1,i) = ridx(cidx) + i-1   ;
+            row(2,i) = i ;
+            col(1,i) = cidx + i-1 ;
+            col(2,i) = i ;
+            A([i,row(i)],:) = A([row(i),i],:) ;  %row swap
+            A(:,[i,row(i)]) = A(:,[row(i),i]) ;  %column swap
+            if A(i,i) == 0
+                disp('Invalid Matrix') ;
+                break ;
+            end
+            
+    end
+    L = zeros(n);
+        for j=1:n
+            s=0;
+            for k=1:j-1
+                s=s+L(j,k)^2;
+            end
+            L(j,j)=sqrt(A(j,j)-s);
+            for i=j+1:n
+                s1=0;
+                for k=1:j-1
+                    s1=s1+L(i,k)*L(j,k);
+                end
+                L(i,j)=(A(i,j)-s1)/L(j,j);
+            end            
+        end 
+        
+        fileoID = fopen('outputBY.txt','w');
+        fprintf(fileoID,'L Matrix(Cholesky Decomposition)\n');
+        fprintf(fileoID,'   row  \n');
+        fprintf(fileoID,'%6.f ',row);
+        fprintf(fileoID,'\n   column  \n');
+        fprintf(fileoID,'%6.f ',col);        
+        fprintf(fileoID ,'\nMatrix\n\r\n');
+        for i=1:n
+        fprintf(fileoID,'%6.4f  ',L(i,:));
+        fprintf(fileoID,'\r\n');
+        end
+        fclose(fileID);
+        fclose(fileoID);
+        
+    elseif x == 'N' 
+    str = input('Enter the input file name:','s') ;
+    str = strcat(str,'.txt') ;
+    fileID = fopen(str,'r') ;
+    line = fgetl(fileID) ;
+    n = sscanf(line,'%d') ;
+     A = zeros(n,n) ;
+     b = zeros(1,n) ;
+    for i = 1:n+1
+      line = fgetl(fileID) ;
+       if i~=n+1
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array A
+        else 
+         b(1,1:n) = sscanf(line,'%f') ;  %storing the value of b   
+       end
+    end  
+    rtemp = zeros(1,n) ;
+    ctemp = zeros(n,1) ;
+    row = zeros(2,n) ;
+    col = zeros(2,n) ;
+    %performing full pivoting on matrix A
+    for i=1:n
+            [rmax , ridx] = max(abs(A(i:n,i:n))) ;   
+           [maxval , cidx] = max(rmax) ;            
+            row(1,i) = ridx(cidx) + i-1   ;
+            row(2,i) = i ;
+            col(i) = cidx + i-1 ;
+            col(2,i) = i ;
+            A([i,row(i)],:) = A([row(i),i],:) ;  %row swap
+            A(:,[i,row(i)]) = A(:,[row(i),i]) ;  %column swap
+            if A(i,i) == 0
+                disp('Invalid Matrix') ;
+                break ;
+            end
+    end
+        method = input('Choose between the following:\n(1)Doolittle Method\n(2)Crout Method\n','s') ;
+        if method ==  '1'    %Doolittle's Method
+            L = eye(n);
+            U = zeros(n) ;
+                 for i= 1:n
+                     for j= i:n
+                      num = sum(L(i,1:i-1)*U(1:i-1,j))  ;
+                      U(i,j) = A(i,j) - num ;
+                     end
+                     for j= i+1:n
+                      num = sum(L(j,1:i-1)*U(1:i-1,i)) ;
+                      L(j,i)= (A(j,i) - num)/U(i,i)  ;
+                     end
+                 end
+            
+        else                 %Crout's Method
+            L = zeros(n) ;
+            U = eye(n) ;
+            
+             for i= 1:n
+                 for j= i:n
+                      num = sum(L(j,1:i-1)*U(1:i-1,i)) ;
+                      L(j,i)= A(j,i) - num  ;
+                      %if i==1
+                      %disp(A(1,1)) ;
+                      %end
+                  end
+                  for j= i+1:n
+                      num = sum(L(i,1:i-1)*U(1:i-1,j));
+                      U(i,j) = (A(i,j) - num)/L(i,i) ;
+                  end
+              end
+             
+        end
+        fileoID = fopen('outputBN.txt','w');
+        fprintf(fileoID,'L-U Decomposition of matrix\n');
+        fprintf(fileoID,'   row  \n');
+        fprintf(fileoID,'%6.f ',row);
+        fprintf(fileoID,'\n   column  \n');
+        fprintf(fileoID,'%6.f ',col);        
+        fprintf(fileoID ,'\nMatrix\n\r\n');
+        fprintf(fileoID,'\nThe L Matrix\n') ;
+        for i=1:n
+        fprintf(fileoID,'%6.4f  ',L(i,:));
+        fprintf(fileoID,'\r\n');
+        end
+        fprintf(fileoID,'\nThe U Matrix\n') ;
+        for i=1:n
+        fprintf(fileoID,'%6.4f  ',U(i,:));
+        fprintf(fileoID,'\r\n');
+        end
+        fclose(fileID);
+        fclose(fileoID);
+    end
+    elseif choice == 'C' 
+        %finding inverse using gauss jordan without pivoting
+    str = input('Enter the input file name:','s') ;
+    str = strcat(str,'.txt') ;
+    fileID = fopen(str,'r') ;
+    line = fgetl(fileID) ;
+    n = sscanf(line,'%d') ;
+    A = zeros(n,n) ;
+    for i = 1:n
+      line = fgetl(fileID) ;
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array A
+    end  
+    I = eye(n) ;
+    for i=1:n
+       a = A(i,i) ;
+       A(i,1:n) = A(i,1:n)/a ;
+       I(i,1:n) = I(i,1:n)/a ;
+       for j= 1:n
+         if j~=i
+             a = A(j,i) ;
+             A(j,1:n) = A(j,1:n) - a*A(i,1:n) ;
+             I(j,1:n) = I(j,1:n) - a*A(i,1:n) ;
+         end
+       end
+    end
+        fileoID = fopen('outputC.txt','w');                   %storing the solution in an output file
+        fprintf(fileoID,'The Inverse Matrix is:\n');
+        for i = 1:n
+          fprintf(fileoID ,'%6.4f   ',I(i,:) ) ;
+          fprintf(fileoID,'\r\n');
+        end
+        fclose(fileID);
+        fclose(fileoID);  
+end
