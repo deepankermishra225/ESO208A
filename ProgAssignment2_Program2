@@ -1,0 +1,101 @@
+close all ;
+clear ;
+clc ;
+%180225
+%Deepanker Mishra
+%Assignment 2 program 2
+str = input('Enter the input file name:','s') ;
+str = strcat(str,'.txt') ;
+fileID = fopen(str,'r') ;
+line = fgetl(fileID) ;
+n = sscanf(line,'%d') ;
+A = zeros(n,n) ;
+for i = 1:n
+      line = fgetl(fileID) ;
+      A(i,1:n) = sscanf(line,'%f') ;    %storing the values of array A
+end 
+line = fgetl(fileID) ;
+err = sscanf(line , '%f') ;        %storing the value of error
+err = err/100 ;
+choice = input('Do you want:\n (L)The largest eigen value or\n (A)All the eigen values\n','s') ;
+if choice == 'L'
+  %POWER METHOD
+  z = zeros(n,1) ;
+  z(1,1) = 1 ;
+  mod = norm(abs(z)) ;
+  y = z/mod ;
+  z = A*y ;
+  lambda = zeros(1,2) ;
+  lambda(1) = abs(transpose(y)*z)     ;
+  itr = 1 ;
+  error = inf ;
+  while error>err 
+      itr = itr + 1 ;
+      mod = norm(abs(z)) ;
+      y = z/mod ;
+      z = A*y ;
+      lambda(2) = abs(transpose(y)*z) ;
+      error = (abs(lambda(2)-lambda(1)))/lambda(2) ;
+      lambda(1) = lambda(2) ;
+  end
+  
+        fileoID = fopen('power_method.txt','w');   %storing the solution in an output file
+        fprintf(fileoID,'The Largest Eigenvalue is:\n');
+        fprintf(fileoID,'%6.4f ',lambda(2));
+        fprintf(fileoID,'\n Number of iterations:');
+        fprintf(fileoID,'%d \n',itr);
+        fclose(fileID);
+        fclose(fileoID);
+  
+elseif choice == 'A'
+   % QR DECOMPOSITION
+    q = zeros(n) ;
+    r = zeros(n) ;
+    z = zeros(n) ;
+    eigen = zeros(1,n) ;
+    prev = eigen ;
+    for i = 1:n
+            eigen(i) = abs(A(i,i)) ; 
+    end
+    error = sum(eigen(1:n))  ;
+    flag = 0 ;
+    itr = 0 ;
+    while(error >err)
+        itr = itr + 1;
+        q(1:n,1) = A(1:n,1)/norm(abs(A(1:n,1)))  ;    %using the L2 norm
+        for j = 2:n
+             csum = zeros(n,1) ;
+             for i = 1:j-1
+                 csum(1:n) = csum(1:n) + (transpose(A(1:n,j))*q(1:n,i))*q(1:n,i)  ; 
+             end
+            z(1:n,j) = A(1:n,j) - csum(1:n)  ;
+            q(1:n,j) = z(1:n,j)/norm(abs(z(1:n,j)))    ;
+        end
+       
+        for i=1:n
+            for j = i:n
+              r(i,j) = transpose(q(1:n,i))*A(1:n,j) ;  
+            end
+        end
+         A = r*q ;
+         for i = 1:n
+            eigen(i) = abs(A(i,i)) ; 
+         end
+         
+         if flag==1
+           error = norm((eigen(1:n)-prev(1:n))/eigen(1:n)) ;
+         else
+             flag = 1 ;
+         end
+         prev = eigen ;
+         
+    end
+        fileoID = fopen('QR_Decomposition.txt','w');   %storing the solution in an output file
+        fprintf(fileoID,'The Eigenvalues are:\n') ;
+        fprintf(fileoID,'%6.4f ',eigen);
+        fprintf(fileoID,'\n Number of iterations:');
+        fprintf(fileoID,'%d \n',itr);
+        fclose(fileID);
+        fclose(fileoID); 
+   
+end
