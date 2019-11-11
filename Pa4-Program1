@@ -1,0 +1,204 @@
+%% DEEPANKER MISHRA ROCKZZ!!!!!!
+
+clear ;
+clc ;
+str = input('Enter the function f(a,b) = db/da   \n:  ','s') ;
+%f   = str2func(['@(t,y)' str]) ;
+syms f(a,b) ;
+f(a,b) = str2sym(str) ;
+%f(a,b) = -2*b + sin(a) ;
+x1  = input('Enter the value of x0        \n:')             ;
+y1  = input('Enter the value of y0        \n:')             ;
+xn  = input('Enter the final value xf        \n:')          ;
+h   = input('Enter the value of step-size        \n:')      ;
+tol = input('Enter the maximum tolerance value        \n:') ;
+opt = input('Choose between the following methods :\n1>Euler Forward\n2>Euler Backward\n3>Trapezoidal\n4>Adams Bashforth Method\n5>Adams Moulton Method\n6>Backward Difference Formulation\n7>Runge Kutta Method\n') ;
+  %% Pa4 begins!! 
+if opt == 1
+    %% Euler_Forward() ;
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    x(n) = xn ;
+    for i=1:n
+        y(i+1) = y(i) + h*f(x(i),y(i)) ;
+        x(i+1) = x(i)+h ;
+    end
+     fid = fopen('Euler_Forward.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==2
+    %% Euler_Backward() ;
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1)   = x1 ;
+    y(1)   = y1 ;
+    x(n+1) = xn ;
+    for i=1:n
+       y(i+1) = y(i) + h*f(x(i),y(i))     ;
+       x(i+1) = x(i) + h ;
+       y(i+1) = y(i) + h*f(x(i+1),y(i+1)) ;
+       
+    end
+     fid = fopen('Euler_Backward.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==3
+    %% Trapezoidal() ; 
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    x(n+1) = xn ;
+    for i=1:n
+       y(i+1) = y(i) + h*f(x(i),y(i)) ;
+       x(i+1) = x(i) + h ;
+       y(i+1) = y(i) + (h/2)*(  f( x(i+1) , y(i+1) ) +  f( x(i) , y(i) ) ) ;
+    end
+     fid = fopen('Trapezoidal.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==4
+    %% Adams_Bashforth() ; 
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    for i=1:n
+       x(i+1) = x(i) + h ; 
+    end
+    %Euler forward ;
+    y(2) = y(1)+h*f(x(1) , y(1)) ;
+    %2nd order
+    y(3) = y(2)+h*((3/2)*f(x(2),y(2)) -(1/2)*f(x(1),y(1)) ) ;
+    %3rd order
+    y(4) = y(3)+h*( (23/12)*f(x(3),y(3))-(4/3)*f(x(2),y(2))+(5/12)*f(x(1),y(1))  ) ;
+    %4th order
+    for i=4:n
+         y(i+1) = y(i)+h*((55/24)*f(x(i),y(i))-(59/24)*f(x(i-1),y(i-1))+(37/24)*f(x(i-2),y(i-2))-(3/8)*f(x(i-3),y(i-3))  ) ; 
+    end
+     fid = fopen('Adams_Bashforth.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==5
+    %% Adams_Moulton() ; 
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    %Euler forward ;
+    y(2) = y(1)+h*f(x(1) , y(1)) ;
+    x(2) = x(1)+h ;
+    %2nd order
+    y(3) = y(2)+h*((3/2)*f(x(2),y(2)) -(1/2)*f(x(1),y(1)) ) ;
+    x(3) = x(2)+h ;
+    %3rd order
+    y(4) = y(3)+h*( (23/12)*f(x(3),y(3))-(4/3)*f(x(2),y(2))+(5/12)*f(x(1),y(1))  ) ;
+    x(4) = x(3)+h ;
+    x(n+1) = xn ;
+    %4th order
+    for i=4:n
+         y(i+1) = y(i) + h*((55/24)*f(x(i),y(i))-(59/24)*f(x(i-1),y(i-1))+(37/24)*f(x(i-2),y(i-2))-(3/8)*f(x(i-3),y(i-3)) ) ; 
+         x(i+1) = x(i) + h ;
+         y(i+1) = y(i) + h*((3/8)*f(x(i+1),y(i+1))+(19/24)*f(x(i),y(i))-(5/24)*f(x(i-1),y(i-1))+(1/24)*f(x(i-2),y(i-2)) ) ;
+    end
+     fid = fopen('Adams_Moulton.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==6
+    %% Backward_Difference_Formulation() ;
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    for i=1:n
+       x(i+1) = x(i)+h ; 
+    end
+    %Euler forward ;
+    y(2) = y(1)+h*f(x(1) , y(1)) ;
+    %2nd order
+    y(3) = y(2)+h*( (3/2)*f(x(2),y(2)) -(1/2)*f(x(1),y(1)) ) ;
+    %3rd order
+    y(4) = y(3)+h*( (23/12)*f(x(3),y(3))-(4/3)*f(x(2),y(2))+(5/12)*f(x(1),y(1))  ) ;
+    %4th order
+    for i=4:n
+        %y(i+1) = y(i) + h*f(x(i),y(i)) ;
+         y(i+1) = y(i)+h*((55/24)*f(x(i),y(i))-(59/24)*f(x(i-1),y(i-1))+(37/24)*f(x(i-2),y(i-2))-(3/8)*f(x(i-3),y(i-3))  ) ; 
+         y(i+1) = y(i) + h*((3/8)*f(x(i+1),y(i+1))+(19/24)*f(x(i),y(i))-(5/24)*f(x(i-1),y(i-1))+(1/24)*f(x(i-2),y(i-2))  ) ;
+         y(i+1) = (12/25)*(h*f(x(i+1),y(i+1)) -(1/4)*y(i-3)+ (4/3)*y(i-2)-3*y(i-1) + 4*y(i) ) ;
+    end
+     fid = fopen('Backward_Difference_Formulation.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+elseif opt==7
+    %% Runge_Kutta() ;
+    n = (xn - x1)/h ;
+    y = zeros(n+1,1) ;
+    x = zeros(n+1,1) ;
+    x(1) = x1 ;
+    y(1) = y1 ;
+    x(n) = xn ;
+    phi = zeros(4,1) ;
+    
+    for i=1:n
+         phi(1) = f(x(i),y(i)) ;
+         phi(2) = f(x(i)+ (h/2) ,y(i) + (1/2)*h*phi(1)) ;
+         phi(3) = f(x(i)+ (h/2) ,y(i) + (1/2)*h*phi(2)) ;
+         phi(4) = f(x(i)+ h , y(i) + h*phi(3) ) ;
+         x(i+1) = x(i) + h ;
+         y(i+1) = y(i) + h*(  (1/6)*phi(1) + (1/3)*(phi(2)+phi(3)) + (1/6)*phi(4)  ) ; 
+    end
+     fid = fopen('Runge_Kutta_Method.txt','w');
+     fprintf(fid , 'The values at the data points are:\n') ;
+     for i= 1:n+1
+        fprintf(fid ,'%f     %f\n',x(i) , y(i)) ;  
+     end
+     fclose(fid) ;
+     scatter(x,y) ;
+     hold on ;
+     plot(x,y) ;
+    
+end
